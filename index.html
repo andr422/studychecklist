@@ -1,0 +1,942 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Оценка компетенций студента</title>
+<meta name="description" content="Чек-лист практики стажёра ABA-центра">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#E8862A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Компетенции">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" href="icons/icon-192.png">
+<style>
+:root{
+  --accent:#E8862A; --accent-soft:#FCEEDD;
+  --ink:#1B2437; --ink-2:#5A6478; --ink-3:#8A93A6;
+  --line:#C9D0E8; --line-2:#E6EAF5;
+  --bg:#F4F6FB; --card:#FFFFFF;
+  --band:#F3EDB4; --band-ink:#4A4520;
+  --blue:#5C6BC0; --blue-soft:#E7EAF8;
+  --ok:#2E9E6B; --ok-soft:#E1F4EB;
+  --warn:#C9781B;
+  --alert-bg:#FFF4E4; --alert-br:#F0C68C; --alert-ink:#8A4B08;
+  --shadow:0 1px 2px rgba(27,36,55,.06),0 8px 24px rgba(27,36,55,.06);
+  --r:14px;
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+:root[data-theme="dark"],
+:root:not([data-theme="light"]){}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --accent:#F2A055; --accent-soft:#3A2A18;
+    --ink:#EAEDF5; --ink-2:#A8B0C2; --ink-3:#7B8397;
+    --line:#39415A; --line-2:#2B3247;
+    --bg:#151926; --card:#1D2233;
+    --band:#3D3A1E; --band-ink:#E8E2B0;
+    --blue:#8892E0; --blue-soft:#262C44;
+    --ok:#4FBF8B; --ok-soft:#1C3A2D;
+    --warn:#E0A05A;
+    --alert-bg:#3B2A14; --alert-br:#6E4C20; --alert-ink:#F7CE93;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"]{
+  --accent:#F2A055; --accent-soft:#3A2A18;
+  --ink:#EAEDF5; --ink-2:#A8B0C2; --ink-3:#7B8397;
+  --line:#39415A; --line-2:#2B3247;
+  --bg:#151926; --card:#1D2233;
+  --band:#3D3A1E; --band-ink:#E8E2B0;
+  --blue:#8892E0; --blue-soft:#262C44;
+  --ok:#4FBF8B; --ok-soft:#1C3A2D;
+  --warn:#E0A05A;
+  --alert-bg:#3B2A14; --alert-br:#6E4C20; --alert-ink:#F7CE93;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  -webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent;
+  overscroll-behavior-y:none;
+}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;padding:0}
+
+/* ---------- header ---------- */
+.top{
+  position:sticky;top:0;z-index:30;background:var(--card);
+  border-bottom:1px solid var(--line-2);
+  padding:calc(env(safe-area-inset-top,0px) + 10px) 14px 0;
+  box-shadow:0 1px 0 rgba(0,0,0,.02);
+}
+.top-row{display:flex;align-items:center;gap:10px}
+.brand{min-width:0;flex:1}
+.brand h1{margin:0;font-size:16px;font-weight:650;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand .who{
+  display:flex;align-items:center;gap:6px;margin-top:1px;
+  font-size:12.5px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.who b{font-weight:600;color:var(--ink)}
+.chevr{opacity:.55;flex:none}
+.iconbtn{
+  width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
+  color:var(--ink-2);flex:none;transition:background .15s
+}
+.iconbtn:active{background:var(--line-2)}
+.iconbtn.on{background:var(--accent-soft);color:var(--accent)}
+
+.meter{display:flex;align-items:center;gap:10px;padding:9px 0 10px}
+.bar{flex:1;height:7px;border-radius:99px;background:var(--line-2);overflow:hidden}
+.bar>i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--accent),#F0B36A);transition:width .35s cubic-bezier(.3,1,.4,1)}
+.meter .pct{font-size:12.5px;font-weight:650;color:var(--ink-2);font-variant-numeric:tabular-nums;flex:none}
+
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:9px;scrollbar-width:none;margin:0 -14px;padding-left:14px;padding-right:14px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  flex:none;padding:6px 11px;border-radius:99px;font-size:13px;font-weight:550;
+  background:var(--line-2);color:var(--ink-2);white-space:nowrap;border:1px solid transparent
+}
+.tab.on{background:var(--ink);color:var(--card)}
+.tab .n{opacity:.6;font-variant-numeric:tabular-nums;margin-left:3px}
+
+/* ---------- search ---------- */
+.searchwrap{padding:10px 14px 0;position:relative}
+.searchwrap input{
+  width:100%;padding:10px 34px 10px 34px;border-radius:11px;border:1px solid var(--line);
+  background:var(--card);outline:none
+}
+.searchwrap input:focus{border-color:var(--accent)}
+.searchwrap .mag{position:absolute;left:24px;top:20px;color:var(--ink-3);pointer-events:none}
+.searchwrap .clr{position:absolute;right:22px;top:19px;color:var(--ink-3);display:none}
+
+/* ---------- content ---------- */
+main{padding:12px 14px calc(28px + var(--safe-b))}
+.instr{
+  background:var(--blue-soft);border-radius:var(--r);padding:12px 14px;margin-bottom:14px;
+  font-size:13.5px;color:var(--ink-2);border:1px solid transparent
+}
+.instr h3{margin:0 0 6px;font-size:13.5px;color:var(--ink);font-weight:650;display:flex;gap:6px;align-items:center}
+.instr p{margin:0 0 6px}
+.instr p:last-child{margin:0}
+.instr .flow{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-top:8px;font-size:12.5px}
+.instr .flow span{background:var(--card);padding:3px 8px;border-radius:7px;border:1px solid var(--line)}
+
+.instr.cta{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 30%,transparent)}
+.instr.cta h3{font-size:15px}
+.instr.cta .btn{max-width:280px}
+
+.alert{
+  position:sticky;top:var(--stick,0px);z-index:20;
+  display:flex;gap:11px;align-items:flex-start;margin-bottom:12px;
+  background:var(--alert-bg);border:1px solid var(--alert-br);
+  border-radius:var(--r);padding:12px;box-shadow:var(--shadow)
+}
+.alert .ic{color:var(--alert-ink);flex:none;margin-top:1px}
+.alert .tx{flex:1;min-width:0;color:var(--alert-ink)}
+.alert .tx b{display:block;font-size:14.5px;font-weight:700;margin-bottom:2px}
+.alert .tx span{font-size:12.5px;opacity:.85;display:block;line-height:1.4}
+.alert .x{
+  flex:none;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;
+  color:var(--alert-ink);opacity:.65;margin:-3px -3px 0 0
+}
+.alert .x:active{background:rgba(0,0,0,.07);opacity:1}
+.alert.pop{animation:alertPop .5s cubic-bezier(.3,1.2,.5,1)}
+@keyframes alertPop{
+  0%{transform:scale(.94);opacity:0}
+  60%{transform:scale(1.02)}
+  100%{transform:none;opacity:1}
+}
+@media (prefers-reduced-motion:reduce){ .alert.pop{animation:none} }
+
+.sec{margin-bottom:16px}
+.band{
+  display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+  background:var(--band);color:var(--band-ink);border-radius:12px;padding:9px 13px;
+  font-weight:700;font-size:14px;position:sticky;z-index:10;
+  top:calc(var(--stick,0px) + var(--alert-h,0px));
+}
+.band .grow{flex:1;min-width:0}
+.band .cnt{font-size:12px;font-weight:650;opacity:.75;font-variant-numeric:tabular-nums}
+.band .caret{transition:transform .2s}
+.sec.closed .caret{transform:rotate(-90deg)}
+.sec.closed .rows{display:none}
+.rows{margin-top:8px;display:flex;flex-direction:column;gap:8px}
+
+.row{
+  background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);
+  padding:11px 12px 10px;border:1px solid transparent;
+}
+.row.done{border-color:color-mix(in srgb,var(--ok) 35%,transparent)}
+.row-t{display:flex;gap:8px;align-items:flex-start}
+.row-t .txt{flex:1;font-size:14px;line-height:1.35;min-width:0}
+.row.done .row-t .txt{color:var(--ink-2)}
+.more{
+  flex:none;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;
+  color:var(--ink-3);margin:-3px -4px 0 0
+}
+.more:active{background:var(--line-2)}
+.badges{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.badge{
+  font-size:11.5px;padding:2px 7px;border-radius:6px;background:var(--line-2);color:var(--ink-2);
+  display:inline-flex;align-items:center;gap:4px;max-width:100%;
+}
+.badge.note{background:var(--accent-soft);color:var(--warn)}
+.badge.vid{background:var(--blue-soft);color:var(--blue);font-weight:600}
+
+.steps{display:flex;gap:6px;margin-top:9px;align-items:stretch}
+.step{
+  flex:1;min-width:0;border:1px solid var(--line);border-radius:10px;
+  padding:6px 4px 5px;text-align:center;background:transparent;
+  display:flex;flex-direction:column;gap:2px;align-items:center;justify-content:center;min-height:48px;
+  transition:background .15s,border-color .15s
+}
+.step .lb{font-size:10px;line-height:1.15;color:var(--ink-3);font-weight:600;letter-spacing:.01em}
+.step .vl{font-size:12px;font-weight:650;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.step.filled{background:var(--ok-soft);border-color:transparent}
+.step.filled .lb{color:color-mix(in srgb,var(--ok) 75%,var(--ink-2))}
+.step.filled .vl{color:var(--ok)}
+.step.next{border-color:var(--accent);border-style:dashed;background:var(--accent-soft)}
+.step.next .lb{color:var(--warn)}
+.step.next .vl{color:var(--warn)}
+.step.na{opacity:.4;border-style:dotted}
+.step.lock{background:var(--line-2);border-color:transparent}
+.step.lock .lb,.step.lock .vl{color:var(--ink-3)}
+.step.fin{flex:1.25}
+.step:active{transform:scale(.97)}
+.divider{width:1px;background:var(--line-2);margin:4px 2px;flex:none}
+
+.empty{text-align:center;color:var(--ink-3);padding:44px 20px;font-size:14px}
+
+/* ---------- sheet ---------- */
+.scrim{position:fixed;inset:0;background:rgba(15,20,32,.42);z-index:50;opacity:0;pointer-events:none;transition:opacity .2s}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{
+  position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--card);
+  border-radius:20px 20px 0 0;padding:8px 16px calc(18px + var(--safe-b));
+  transform:translateY(calc(100% + 30px));transition:transform .26s cubic-bezier(.3,1,.4,1);
+  max-height:88vh;overflow:auto;box-shadow:0 -8px 40px rgba(0,0,0,.16)
+}
+.sheet.on{transform:none}
+.grab{width:38px;height:4px;border-radius:9px;background:var(--line);margin:4px auto 12px}
+.sheet h2{margin:0 0 3px;font-size:16px;font-weight:650}
+.sheet .sub{color:var(--ink-2);font-size:13px;margin:0 0 14px}
+.fld{margin-bottom:11px}
+.fld label{display:block;font-size:12px;font-weight:600;color:var(--ink-2);margin-bottom:4px}
+.fld input,.fld textarea,.fld select{
+  width:100%;padding:10px 12px;border-radius:11px;border:1px solid var(--line);
+  background:var(--bg);outline:none
+}
+.fld input:focus,.fld textarea:focus{border-color:var(--accent);background:var(--card)}
+.fld textarea{resize:vertical;min-height:74px}
+.hint{font-size:11.5px;color:var(--ink-3);margin-top:4px}
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+  padding:12px;border-radius:12px;font-weight:600;font-size:14.5px;
+  background:var(--ink);color:var(--card);margin-top:6px
+}
+.btn.sec2{background:var(--line-2);color:var(--ink)}
+.btn.danger{background:transparent;color:#D6483B}
+.btn.accent{background:var(--accent);color:#fff}
+.btn:disabled{opacity:.45}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid2 .btn{margin-top:0}
+
+.stepedit{display:flex;flex-direction:column;gap:7px;margin-bottom:12px}
+.se{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:12px;background:var(--bg)}
+.se .n{
+  width:22px;height:22px;border-radius:7px;background:var(--line-2);color:var(--ink-2);
+  display:grid;place-items:center;font-size:11px;font-weight:700;flex:none
+}
+.se.done .n{background:var(--ok);color:#fff}
+.se .lbl{flex:1;font-size:13.5px;min-width:0}
+.se .lbl small{display:block;color:var(--ink-3);font-size:11.5px}
+.se input[type=date]{
+  padding:6px 8px;border-radius:9px;border:1px solid var(--line);background:var(--card);
+  font-size:13px;width:135px;flex:none
+}
+.se .x{color:var(--ink-3);padding:3px 5px;flex:none}
+.se.locked{opacity:.55}
+.toast{
+  position:fixed;left:50%;transform:translateX(-50%) translateY(20px);
+  bottom:calc(24px + var(--safe-b));background:var(--ink);color:var(--bg);
+  padding:9px 16px;border-radius:99px;font-size:13.5px;font-weight:550;z-index:80;
+  opacity:0;transition:.22s;pointer-events:none;box-shadow:0 6px 20px rgba(0,0,0,.2);max-width:88vw;text-align:center
+}
+.toast.on{opacity:1;transform:translateX(-50%)}
+.seg{display:flex;background:var(--bg);border-radius:11px;padding:3px;gap:3px;margin-bottom:12px}
+.seg button{flex:1;padding:8px;border-radius:9px;font-size:13px;font-weight:600;color:var(--ink-2)}
+.seg button.on{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
+.secline{height:1px;background:var(--line-2);margin:14px -16px}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:9px 0;font-size:13.5px;border-bottom:1px solid var(--line-2)}
+.kv:last-child{border:0}
+.kv span{color:var(--ink-2)}
+.kv b{font-weight:600;font-variant-numeric:tabular-nums}
+
+/* ---------- print ---------- */
+#printarea{display:none}
+@media print{
+  .top,.searchwrap,main,.fab,.scrim,.sheet,.toast{display:none!important}
+  #printarea{display:block;padding:0}
+  body{background:#fff;color:#000;font-size:9pt}
+  @page{size:A4;margin:12mm 10mm}
+  #printarea h1{font-size:15pt;margin:0 0 2mm;color:#E8862A}
+  #printarea .ph{font-size:9pt;margin:0 0 4mm;color:#333}
+  #printarea table{width:100%;border-collapse:collapse}
+  #printarea th,#printarea td{border:.5pt solid #5C6BC0;padding:1.6mm 2mm;vertical-align:top;font-size:8pt}
+  #printarea th{background:#DDE2F5;font-size:7.5pt;text-align:center;font-weight:600}
+  #printarea td.d{text-align:center;white-space:nowrap;font-size:7.5pt}
+  #printarea tr.band td{background:#F3EDB4;font-weight:700;text-align:center;font-size:9pt}
+  #printarea td.t{width:38%}
+  #printarea .fin{font-size:7pt;line-height:1.3}
+  #printarea tr{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-row">
+    <button class="iconbtn" id="btnMenu" aria-label="Меню">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <div class="brand">
+      <h1>Оценка компетенций</h1>
+      <button class="who" id="btnWho">
+        <b id="whoName">—</b>
+        <svg class="chevr" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17v3z"/></svg>
+      </button>
+    </div>
+    <button class="iconbtn" id="btnCur" aria-label="Режим куратора">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10.5" width="16" height="10" rx="2.5"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>
+    </button>
+  </div>
+  <div class="meter">
+    <div class="bar"><i id="barFill"></i></div>
+    <div class="pct" id="pctTxt">0%</div>
+  </div>
+  <div class="tabs" id="tabs"></div>
+</header>
+
+<div class="searchwrap">
+  <svg class="mag" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+  <input id="q" type="search" placeholder="Поиск по навыку" autocomplete="off">
+  <button class="clr" id="qClr" aria-label="Очистить">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg>
+  </button>
+</div>
+
+<main id="app"></main>
+
+<div class="scrim" id="scrim"></div>
+
+<!-- row sheet -->
+<div class="sheet" id="shRow">
+  <div class="grab"></div>
+  <h2 id="rTitle">—</h2>
+  <p class="sub" id="rSec">—</p>
+  <div class="stepedit" id="rSteps"></div>
+  <div class="fld">
+    <label>Ссылка на видео-подсказку</label>
+    <input id="rLink" type="url" inputmode="url" placeholder="https://…">
+    <div class="hint">Заменяет QR-код из бумажной брошюры. Ссылка общая для всех стажёров.</div>
+  </div>
+  <div class="fld">
+    <label>Заметка куратора / стажёра</label>
+    <textarea id="rNote" placeholder="Что доработать, на что обратить внимание…"></textarea>
+  </div>
+  <button class="btn" id="rSave">Готово</button>
+</div>
+
+<!-- menu sheet -->
+<div class="sheet" id="shMenu">
+  <div class="grab"></div>
+  <h2>Настройки и данные</h2>
+  <p class="sub" id="mSub">—</p>
+  <div class="fld"><label>Имя стажёра</label><input id="pName" placeholder="Иванова Мария"></div>
+  <div class="fld"><label>Куратор</label><input id="pCur" placeholder="Петрова Анна"></div>
+  <div class="fld"><label>Начало практики</label><input id="pStart" type="date"></div>
+  <div class="secline"></div>
+  <div class="seg" id="segTheme">
+    <button data-t="auto">Авто</button><button data-t="light">Светлая</button><button data-t="dark">Тёмная</button>
+  </div>
+  <div id="mStats"></div>
+  <div class="secline"></div>
+  <div class="grid2">
+    <button class="btn sec2" id="mExport">Экспорт JSON</button>
+    <button class="btn sec2" id="mImport">Импорт JSON</button>
+  </div>
+  <div class="grid2" style="margin-top:8px">
+    <button class="btn sec2" id="mCsv">Экспорт CSV</button>
+    <button class="btn sec2" id="mPrint">Печать / PDF</button>
+  </div>
+  <button class="btn sec2" id="mInstall" style="margin-top:8px;display:none">Установить приложение</button>
+  <div class="secline"></div>
+  <button class="btn danger" id="mReset">Очистить чек-лист стажёра</button>
+  <p class="hint" style="text-align:center">Данные не уходят в сеть — всё лежит в этом браузере. Делайте экспорт JSON перед сменой устройства.</p>
+  <input type="file" id="fileIn" accept="application/json,.json" hidden>
+</div>
+
+<!-- curator sheet -->
+<div class="sheet" id="shCur">
+  <div class="grab"></div>
+  <h2 id="cTitle">Режим куратора</h2>
+  <p class="sub" id="cSub">Последний столбец заполняет только куратор.</p>
+  <div class="fld"><label>PIN-код</label><input id="cPin" type="password" inputmode="numeric" maxlength="8" placeholder="••••"></div>
+  <button class="btn accent" id="cGo">Войти</button>
+  <button class="btn sec2" id="cSet" style="margin-top:8px">Задать / сменить PIN</button>
+</div>
+
+<div class="toast" id="toast"></div>
+<div id="printarea"></div>
+
+<script>
+/* ============================================================
+   Данные чек-листа. Расшифровано с бумажной брошюры (© 2023, ABC).
+   f: 'both' — нужны отметки куратора и на сессии;
+      'cur'  — только куратор;  'ses' — только на сессии.
+   v: true   — в брошюре здесь стоял QR-код с видео-подсказкой.
+   ============================================================ */
+const DATA=[
+ {s:"Организационные моменты", r:[
+  {id:"o1", t:"Подготовить материал, папку и чек-листы по программе", f:"cur"},
+  {id:"o2", t:"Материал готов к работе, организован, после использования в задании сразу же организуется (убирается в коробку, складывается в стопку, не разбросан вокруг на столах и полу)", f:"ses"},
+  {id:"o3", t:"Игровые материалы убираются в полном объёме при переходе к другой игре", f:"ses"},
+  {id:"o4", t:"Следит за безопасностью ребёнка", f:"ses"},
+  {id:"o5", t:"Ребёнок не находится без присмотра", f:"ses"},
+  {id:"o6", t:"Убирать комнату после занятия", f:"ses"},
+  {id:"o7", t:"Организация пространства (убирать коробку с игрушками, после себя вытирать стол и оставлять кабинет в норме, коробку с материалами содержать в приличном виде на занятии и вне)", f:"ses"}
+ ]},
+ {s:"Сотрудничество и руководящий контроль", r:[
+  {id:"c1", t:"Требует выполнения всех данных инструкций, как в заданиях, так и «бытовых»", f:"ses"},
+  {id:"c2", t:"Перинг: комментирование", f:"both", v:true, u:"https://drive.google.com/file/d/1VKq0_PSxjRUHfrp1Pj4kXbOuM91JQOiz/view?usp=drive_link"},
+  {id:"c3", t:"Перинг: помощь", f:"both", v:true, u:"https://drive.google.com/file/d/1jNED09ZyBxo400EvGsx_YO4ffLPyDL9a/view?usp=drive_link"},
+  {id:"c4", t:"Перинг: повторение", f:"both", v:true, u:"https://drive.google.com/file/d/1tNhghi6gTuxJZJfdOnynMiOReCnf8qBO/view?usp=drive_link"},
+  {id:"c5", t:"Перинг: взаимодействие и новые идеи", f:"both"}
+ ]},
+ {s:"Мотивация", r:[
+  {id:"m1", t:"Пробует и выявляет новые мотивационные стимулы ребёнка / записывает в таблицу", f:"both"},
+  {id:"m2", t:"Обращает внимание на мотивацию ребёнка (использует интерес как поощрение, не даёт сложные задания на слабой мотивации и наоборот)", f:"ses"}
+ ]},
+ {s:"Работа отдельными блоками", r:[
+  {id:"b1", t:"Использует заданный режим", f:"both"},
+  {id:"b2", t:"Чётко предоставляет инструкции", f:"ses"},
+  {id:"b3", t:"Чётко и вовремя предоставляет подсказки", f:"ses"},
+  {id:"b4", t:"Быстро и в нужном объёме предоставляет подкрепление", f:"ses"},
+  {id:"b5", t:"Тон голоса соответствует возрасту ребёнка", f:"ses"},
+  {id:"b6", t:"Смешанные блоки, простые и сложные задания перемежаются", f:"both"}
+ ]},
+ {s:"Подсказки и коррекция ошибки", r:[
+  {id:"p1", t:"Физическая подсказка", f:"both", v:true, u:"https://drive.google.com/file/d/1sySZ2F0W-_0F5qc8o9FRT-f-xky-2AQY/view?usp=drive_link"},
+  {id:"p2", t:"Жестовая подсказка", f:"both", v:true, u:"https://drive.google.com/file/d/1NEWxZcTOxdH5yJ6S9RJbG15zBnpeesgt/view?usp=drive_link"},
+  {id:"p3", t:"Подсказка-модель", f:"both", v:true, u:"https://drive.google.com/file/d/1YKtarabpR9i1jBEqjKF-dWxqGHxHKcGJ/view?usp=drive_link"},
+  {id:"p4", t:"Вербальная подсказка", f:"both", v:true, u:"https://drive.google.com/file/d/1fN3Ili2_zcKJozYQZ-KoPJHW8Z6dyp66/view?usp=drive_link"},
+  {id:"p5", t:"Эхо-подсказка", f:"both", v:true, u:"https://drive.google.com/file/d/1VB-urb_baKcbdmFzI3V4bhabOyxV9QtY/view?usp=drive_link"},
+  {id:"p6", t:"Безошибочное обучение (вовремя подсказка)", f:"both", v:true, u:"https://drive.google.com/file/d/1FMZ6rAHmaD5Ph5_gdDDqLeqO0KTt50cv/view?usp=drive_link"},
+  {id:"p7", t:"Перенос после подсказки", f:"both", v:true, u:"https://drive.google.com/file/d/1rbjdgB9IGBlmcVTLj9kCX9Iix_oZ5KS4/view?usp=drive_link"},
+  {id:"p8", t:"Процедура коррекции ошибки", f:"both", v:true, u:"https://drive.google.com/file/d/1UHJBog2NB9xkBH3nTixMa_7SHV9KXLJ1/view?usp=drive_link"}
+ ]},
+ {s:"Работа в натуральной среде", r:[
+  {id:"n1", t:"Правильное выполнение задач по чек-листу в ситуации NET", f:"both"}
+ ]},
+ {s:"Работа с просьбами", r:[
+  {id:"r1", t:"Вызвать хотя бы 3 разные просьбы за наблюдение", f:"ses"},
+  {id:"r2", t:"Поддержка спонтанной коммуникации ребёнка во время сессии", f:"ses"}
+ ]},
+ {s:"Разное", r:[
+  {id:"d1", t:"Визуальное расписание", f:"both"},
+  {id:"d2", t:"Жетоны", f:"both"},
+  {id:"d3", t:"Сначала / потом", f:"both"},
+  {id:"d4", t:"Обучение с использованием цепочки поведения", f:"both"},
+  {id:"d5", t:"Обучение с использованием формирования", f:"both"},
+  {id:"d6", t:"Обучение различению стимулов", f:"both"},
+  {id:"d7", t:"Следование написанному протоколу", f:"cur"},
+  {id:"d8", t:"Заметки о проведённой сессии", f:"cur"}
+ ]},
+ {s:"Нежелательное поведение", r:[
+  {id:"u1", t:"Гашение НП", f:"both"},
+  {id:"u2", t:"Дифференцированное подкрепление DRA/DRO", f:"both"}
+ ]}
+];
+
+const STEPS=[
+ {k:"video", lb:"Видео",  full:"Посмотрел(а) видео-подсказку"},
+ {k:"seen",  lb:"Видели", full:"Видели на сессии"},
+ {k:"did",   lb:"Делали", full:"Делали на чужой сессии"}
+];
+
+/* ---------------- state ---------------- */
+const KEY="aba_comp_v1";
+const PIN_DEFAULT="1908";
+const ALL=DATA.flatMap(s=>s.r.map(r=>({...r,sec:s.s})));
+const BYID=Object.fromEntries(ALL.map(r=>[r.id,r]));
+
+let db=load();
+let ui={filter:"all", q:"", openRow:null, closed:{}};
+
+function load(){
+  try{
+    const raw=localStorage.getItem(KEY);
+    if(raw) return migrate(JSON.parse(raw));
+  }catch(e){}
+  return blank();
+}
+function blank(){
+  return {profile:{name:"",curator:"",start:today()}, data:{}, links:{},
+          pin:PIN_DEFAULT, curator:false, theme:"auto"};
+}
+function migrate(o){
+  if(o && o.students){            // старый формат с выбором стажёра
+    const s=o.students.find(x=>x.id===o.active)||o.students[0]||null;
+    o={profile:{name:s?s.name:"", curator:s?s.curator:"", start:s?s.start:today()},
+       data:s?(s.data||{}):{}, links:o.links||{}, pin:o.pin, theme:o.theme};
+  }
+  o=o||{};
+  o.profile=o.profile||{name:"",curator:"",start:today()};
+  o.data=o.data||{}; o.links=o.links||{}; o.theme=o.theme||"auto";
+  if(!o.pin) o.pin=PIN_DEFAULT;
+  o.curator=false;                // режим куратора всегда выключен при запуске
+  return o;
+}
+let saveTimer;
+function save(){
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>{
+    try{localStorage.setItem(KEY,JSON.stringify(db));}
+    catch(e){toast("Не удалось сохранить: нет места в хранилище");}
+  },120);
+}
+function rec(id){ return db.data[id]||(db.data[id]={}); }
+function today(){const d=new Date();return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate());}
+function p2(n){return String(n).padStart(2,"0")}
+function fmt(d){ if(!d) return ""; const[y,m,dd]=d.split("-"); return dd+"."+m+"."+y.slice(2); }
+
+/* -------------- row logic -------------- */
+/* u — ссылка, вшитая в приложение; db.links — переопределение на этом устройстве. */
+function linkOf(id){ return db.links[id] || (BYID[id] && BYID[id].u) || ""; }
+
+function finKeys(r){ return r.f==="both"?["fk","fs"]:r.f==="cur"?["fk"]:["fs"]; }
+function finLabel(k){ return k==="fk"?"куратор":"на сессии"; }
+function stepKeys(r){ return r.v?["video","seen","did"]:["seen","did"]; }
+function isDone(r){ const d=rec(r.id); return finKeys(r).every(k=>!!d[k]); }
+function preDone(r){ const d=rec(r.id); return stepKeys(r).every(k=>!!d[k]); }
+function nextKey(r){
+  const d=rec(r.id);
+  for(const k of stepKeys(r)) if(!d[k]) return k;
+  for(const k of finKeys(r)) if(!d[k]) return k;
+  return null;
+}
+/* Все кнопки чек-листа: 11 «видео» + 41 «видели» + 41 «делали»
+   + 27 «куратор» + 38 «на сессии» = 158. Прогресс считается по ним. */
+function keysOf(r){ return stepKeys(r).concat(finKeys(r)); }
+const BTN_TOTAL=ALL.reduce((n,r)=>n+keysOf(r).length,0);
+
+function marked(rows){
+  let n=0, t=0;
+  rows.forEach(r=>{ const d=rec(r.id); keysOf(r).forEach(k=>{ t++; if(d[k]) n++; }); });
+  return {n, t};
+}
+/* Порог: 65 отметок в столбцах «Видели на сессии» и «Делали на чужой сессии»
+   (всего их 82 — по одной на каждый из 41 навыка). */
+const ALERT_KEYS=["seen","did"];
+const ALERT_AT=65;
+const ALERT_TOTAL=ALL.length*ALERT_KEYS.length;
+function alertCount(){
+  let n=0;
+  ALL.forEach(r=>{ const d=rec(r.id); ALERT_KEYS.forEach(k=>{ if(d[k]) n++; }); });
+  return n;
+}
+function alertOn(){ return alertCount()>=ALERT_AT && !db.alertHidden; }
+function alertHTML(){
+  if(!alertOn()) return "";
+  return '<div class="alert" id="curAlert">'+
+    '<svg class="ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0-6 6c0 4-1.5 5.5-2 6h16c-.5-.5-2-2-2-6a6 6 0 0 0-6-6z"/><path d="M10.5 20a1.8 1.8 0 0 0 3 0"/></svg>'+
+    '<div class="tx"><b>Пора назначать куратора</b>'+
+    '<span>Свяжитесь с администратором. Отмечено '+alertCount()+' из '+ALERT_TOTAL+
+    ' в столбцах «Видели» и «Делали».</span></div>'+
+    '<button class="x" id="alertX" aria-label="Закрыть">'+
+      '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>'+
+    '</button></div>';
+}
+
+function stats(){
+  let done=0, ready=0;
+  ALL.forEach(r=>{ if(isDone(r)) done++; else if(preDone(r)) ready++; });
+  const m=marked(ALL);
+  return {done, ready, total:ALL.length, wip:ALL.length-done-ready, btn:m.n, btnTotal:BTN_TOTAL};
+}
+
+/* -------------- render -------------- */
+const app=document.getElementById("app");
+
+function passFilter(r){
+  if(ui.q){
+    const s=(r.t+" "+r.sec).toLowerCase();
+    if(!s.includes(ui.q)) return false;
+  }
+  if(ui.filter==="done") return isDone(r);
+  if(ui.filter==="wait") return !isDone(r) && preDone(r);
+  if(ui.filter==="todo") return !isDone(r) && !preDone(r);
+  return true;
+}
+
+function render(){
+  document.getElementById("whoName").textContent = db.profile.name || "Укажите имя стажёра";
+  const st=stats(), pct=Math.round(st.btn/st.btnTotal*100);
+  document.getElementById("barFill").style.width=pct+"%";
+  document.getElementById("pctTxt").textContent=pct+"%";
+  document.getElementById("btnCur").classList.toggle("on",!!db.curator);
+  renderTabs(st);
+
+  let html = alertHTML() + (db.profile.name?"":ctaHTML()) + instrHTML();
+  let shown=0;
+  DATA.forEach((sec,si)=>{
+    const rows=sec.r.filter(passFilter);
+    if(!rows.length) return;
+    shown+=rows.length;
+    const m=marked(sec.r);
+    const closed=ui.closed[sec.s]?" closed":"";
+    html+='<section class="sec'+closed+'" data-sec="'+esc(sec.s)+'">'+
+      '<button class="band" data-band="'+si+'">'+
+        '<svg class="caret" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>'+
+        '<span class="grow">'+esc(sec.s)+'</span>'+
+        '<span class="cnt">'+m.n+'/'+m.t+'</span>'+
+      '</button><div class="rows">'+rows.map(rowHTML).join("")+'</div></section>';
+  });
+  if(!shown) html+='<div class="empty">Ничего не найдено</div>';
+  app.innerHTML=html;
+  stick();
+}
+
+function ctaHTML(){
+  return '<div class="instr cta">'+
+   '<h3>Чей это чек-лист?</h3>'+
+   '<p>Имя стажёра и куратора нужны для отчёта. Отмечать даты можно и без них.</p>'+
+   '<button class="btn accent" id="ctaAdd" style="margin-top:10px">Заполнить</button>'+
+  '</div>';
+}
+
+function instrHTML(){
+  if(ui.q||ui.filter!=="all") return "";
+  return '<div class="instr">'+
+   '<h3>Как заполнять</h3>'+
+   '<p>Ставьте дату, когда навык успешно продемонстрирован. Чек-лист заполняется слева направо.</p>'+
+   '<div class="flow"><span>Видео</span>→<span>Видели на сессии</span>→<span>Делали на чужой сессии</span>→<span>Самостоятельно</span></div>'+
+   '<p style="margin-top:8px">Последний столбец («Самостоятельно демонстрирует на своём занятии») заполняет <b>только куратор</b> — включите режим куратора кнопкой с замком.</p>'+
+  '</div>';
+}
+
+function rowHTML(r){
+  const d=rec(r.id), nk=nextKey(r), done=isDone(r);
+  const link=linkOf(r.id);
+  let badges="";
+  if(r.v||link) badges+='<span class="badge vid">▶ видео'+(link?"":" — добавьте ссылку")+'</span>';
+  if(d.note) badges+='<span class="badge note">'+esc(d.note.length>46?d.note.slice(0,46)+"…":d.note)+'</span>';
+
+  let steps="";
+  stepKeys(r).forEach(k=>{
+    const S=STEPS.find(x=>x.k===k), val=d[k];
+    steps+='<button class="step'+(val?" filled":"")+(nk===k?" next":"")+'" data-row="'+r.id+'" data-k="'+k+'">'+
+      '<span class="lb">'+S.lb+'</span><span class="vl">'+(val?fmt(val):"—")+'</span></button>';
+  });
+  if(!r.v) steps='<button class="step na" data-row="'+r.id+'" data-k="video" disabled><span class="lb">Видео</span><span class="vl">нет</span></button>'+steps;
+  steps+='<div class="divider"></div>';
+  finKeys(r).forEach(k=>{
+    const val=d[k], locked=!db.curator;
+    steps+='<button class="step fin'+(val?" filled":"")+(nk===k&&db.curator?" next":"")+(locked&&!val?" lock":"")+'" data-row="'+r.id+'" data-k="'+k+'">'+
+      '<span class="lb">'+(locked&&!val?"🔒 ":"")+finLabel(k)+'</span><span class="vl">'+(val?fmt(val):"—")+'</span></button>';
+  });
+
+  return '<article class="row'+(done?" done":"")+'">'+
+    '<div class="row-t"><div class="txt">'+esc(r.t)+'</div>'+
+    '<button class="more" data-open="'+r.id+'" aria-label="Подробнее">'+
+      '<svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>'+
+    '</button></div>'+
+    (badges?'<div class="badges">'+badges+'</div>':'')+
+    '<div class="steps">'+steps+'</div></article>';
+}
+
+function renderTabs(st){
+  const t=document.getElementById("tabs");
+  const defs=[["all","Все",st.total],["todo","В работе",st.wip],["wait","Ждёт куратора",st.ready],["done","Готово",st.done]];
+  t.innerHTML=defs.map(([k,l,n])=>'<button class="tab'+(ui.filter===k?" on":"")+'" data-f="'+k+'">'+l+'<span class="n">'+n+'</span></button>').join("");
+}
+
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+
+/* -------------- interactions -------------- */
+app.addEventListener("click",e=>{
+  if(e.target.closest("#alertX")){ db.alertHidden=true; save(); render(); return; }
+  if(e.target.closest("#ctaAdd")){ renderMenu(); openSheet("shMenu"); return; }
+  const band=e.target.closest("[data-band]");
+  if(band){ const n=DATA[+band.dataset.band].s; ui.closed[n]=!ui.closed[n]; render(); return; }
+  const more=e.target.closest("[data-open]");
+  if(more){ openRow(more.dataset.open); return; }
+  const st=e.target.closest(".step:not([disabled])");
+  if(st) tapStep(st.dataset.row, st.dataset.k);
+});
+
+function tapStep(id,k){
+  const r=BYID[id], d=rec(id), isFin=k==="fk"||k==="fs";
+  if(isFin && !db.curator){ openSheet("shCur"); toast("Этот столбец заполняет куратор"); return; }
+  if(d[k]){ openRow(id); return; }
+  if(!isFin){
+    const prev=stepKeys(r).slice(0,stepKeys(r).indexOf(k));
+    const miss=prev.filter(p=>!d[p]);
+    if(miss.length) toast("Обычно сначала: "+miss.map(p=>STEPS.find(x=>x.k===p).lb.toLowerCase()).join(", "));
+  }
+  const was=alertOn();
+  d[k]=today();
+  save(); render();
+  popAlert(was);
+  if(isDone(r)) toast("Навык освоен ✓");
+}
+
+/* Плашка появилась только что — показать её и подсветить. */
+function popAlert(was){
+  if(was || !alertOn()) return;
+  const a=document.getElementById("curAlert"); if(!a) return;
+  window.scrollTo({top:0, behavior:"smooth"});
+  a.classList.add("pop");
+}
+
+/* -------------- sheets -------------- */
+const scrim=document.getElementById("scrim");
+function openSheet(id){
+  document.querySelectorAll(".sheet").forEach(s=>s.classList.remove("on"));
+  document.getElementById(id).classList.add("on");
+  scrim.classList.add("on");
+}
+function closeSheets(){
+  document.querySelectorAll(".sheet").forEach(s=>s.classList.remove("on"));
+  scrim.classList.remove("on");
+}
+scrim.onclick=closeSheets;
+
+function openRow(id){
+  ui.openRow=id;
+  const r=BYID[id], d=rec(id);
+  document.getElementById("rTitle").textContent=r.t;
+  document.getElementById("rSec").textContent=r.sec;
+  document.getElementById("rLink").value=linkOf(id);
+  document.getElementById("rNote").value=d.note||"";
+  const box=document.getElementById("rSteps");
+  const keys=[...stepKeys(r).map(k=>({k,lb:STEPS.find(x=>x.k===k).full,lock:false})),
+              ...finKeys(r).map(k=>({k,lb:"Самостоятельно — "+finLabel(k),lock:!db.curator}))];
+  box.innerHTML=keys.map((o,i)=>
+    '<div class="se'+(d[o.k]?" done":"")+(o.lock?" locked":"")+'">'+
+      '<span class="n">'+(d[o.k]?"✓":i+1)+'</span>'+
+      '<span class="lbl">'+esc(o.lb)+'</span>'+
+      '<input type="date" data-dk="'+o.k+'" value="'+(d[o.k]||"")+'"'+(o.lock?" disabled":"")+'>'+
+      (d[o.k]&&!o.lock?'<button class="x" data-clr="'+o.k+'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>':"")+
+    '</div>').join("");
+  if(linkOf(id)){
+    const a=document.createElement("a");
+    a.href=linkOf(id); a.target="_blank"; a.rel="noopener noreferrer";
+    a.className="btn sec2"; a.style.marginBottom="12px"; a.textContent="▶ Открыть видео-подсказку";
+    box.insertAdjacentElement("afterend",a);
+    a.id="rVidLink";
+  }else{ const old=document.getElementById("rVidLink"); if(old) old.remove(); }
+  openSheet("shRow");
+}
+document.getElementById("rSteps").addEventListener("change",e=>{
+  const k=e.target.dataset.dk; if(!k) return;
+  const was=alertOn();
+  rec(ui.openRow)[k]=e.target.value; save(); render(); openRow(ui.openRow);
+  popAlert(was);
+});
+document.getElementById("rSteps").addEventListener("click",e=>{
+  const b=e.target.closest("[data-clr]"); if(!b) return;
+  delete rec(ui.openRow)[b.dataset.clr]; save(); render(); openRow(ui.openRow);
+});
+document.getElementById("rSave").onclick=()=>{
+  const id=ui.openRow, link=document.getElementById("rLink").value.trim();
+  if(link && link!==(BYID[id].u||"")) db.links[id]=link; else delete db.links[id];
+  const n=document.getElementById("rNote").value.trim();
+  if(n) rec(id).note=n; else delete rec(id).note;
+  save(); render(); closeSheets();
+};
+
+/* профиль стажёра */
+document.getElementById("btnWho").onclick=()=>{ renderMenu(); openSheet("shMenu"); };
+[["pName","name"],["pCur","curator"],["pStart","start"]].forEach(([el,k])=>{
+  document.getElementById(el).addEventListener("input",e=>{
+    db.profile[k]=e.target.value.trim(); save(); render();
+  });
+});
+
+/* curator mode */
+document.getElementById("btnCur").onclick=()=>{
+  if(db.curator){ db.curator=false; save(); render(); toast("Режим куратора выключен"); return; }
+  document.getElementById("cPin").value="";
+  document.getElementById("cSub").textContent = db.pin
+    ? "Последний столбец заполняет только куратор. Введите PIN."
+    : "PIN снят — вход свободный.";
+  document.getElementById("cGo").textContent = db.pin?"Войти":"Войти без PIN";
+  openSheet("shCur");
+};
+document.getElementById("cGo").onclick=()=>{
+  const v=document.getElementById("cPin").value;
+  if(db.pin && v!==db.pin){ toast("Неверный PIN"); return; }
+  db.curator=true; save(); render(); closeSheets(); toast("Режим куратора включён");
+};
+document.getElementById("cSet").onclick=()=>{
+  const v=document.getElementById("cPin").value.trim();
+  if(db.pin && !db.curator){ toast("Сначала войдите со старым PIN"); return; }
+  db.pin=v; db.curator=true; save(); render(); closeSheets();
+  toast(v?"PIN сохранён":"PIN снят");
+};
+
+/* menu */
+document.getElementById("btnMenu").onclick=()=>{ renderMenu(); openSheet("shMenu"); };
+function renderMenu(){
+  const st=stats();
+  document.getElementById("pName").value=db.profile.name||"";
+  document.getElementById("pCur").value=db.profile.curator||"";
+  document.getElementById("pStart").value=db.profile.start||today();
+  document.getElementById("mSub").textContent="Один чек-лист на одного стажёра.";
+  document.getElementById("mStats").innerHTML=
+    '<div class="kv"><span>Отмечено кнопок</span><b>'+st.btn+' / '+st.btnTotal+'</b></div>'+
+    '<div class="kv"><span>Освоено навыков</span><b>'+st.done+' / '+st.total+'</b></div>'+
+    '<div class="kv"><span>Ждёт подтверждения куратора</span><b>'+st.ready+'</b></div>'+
+    '<div class="kv"><span>Видео-подсказок со ссылкой</span><b>'+
+      ALL.filter(r=>r.v&&linkOf(r.id)).length+' / '+ALL.filter(r=>r.v).length+'</b></div>';
+  document.querySelectorAll("#segTheme button").forEach(b=>b.classList.toggle("on",b.dataset.t===(db.theme||"auto")));
+}
+document.getElementById("segTheme").onclick=e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  db.theme=b.dataset.t; save(); applyTheme(); renderMenu();
+};
+function applyTheme(){
+  const t=db.theme||"auto";
+  if(t==="auto") document.documentElement.removeAttribute("data-theme");
+  else document.documentElement.setAttribute("data-theme",t);
+}
+
+document.getElementById("mExport").onclick=()=>{
+  dl("kompetencii-"+fileName()+".json", JSON.stringify(db,null,1), "application/json");
+};
+function fileName(){
+  const n=(db.profile.name||"stazher").replace(/\s+/g,"_");
+  return n+"-"+today();
+}
+document.getElementById("mImport").onclick=()=>document.getElementById("fileIn").click();
+document.getElementById("fileIn").onchange=e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const rd=new FileReader();
+  rd.onload=()=>{
+    try{
+      const o=JSON.parse(rd.result);
+      if(!o || (!o.data && !o.students)) throw 0;
+      if(!confirm("Заменить текущие данные данными из файла?")) return;
+      db=migrate(o); save(); applyTheme(); render(); closeSheets(); toast("Импортировано");
+    }catch(err){ toast("Файл не подходит"); }
+  };
+  rd.readAsText(f); e.target.value="";
+};
+document.getElementById("mCsv").onclick=()=>{
+  const q=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
+  let out=["Раздел","Навык","Видео","Видели на сессии","Делали на чужой сессии","Самостоятельно: куратор","Самостоятельно: на сессии","Заметка"].map(q).join(";")+"\n";
+  ALL.forEach(r=>{
+    const d=rec(r.id);
+    out+=[r.sec,r.t,r.v?(d.video||""):"—",d.seen||"",d.did||"",
+      r.f==="ses"?"—":(d.fk||""), r.f==="cur"?"—":(d.fs||""), d.note||""].map(q).join(";")+"\n";
+  });
+  dl("kompetencii-"+fileName()+".csv","﻿"+out,"text/csv");
+};
+function dl(name,text,type){
+  const b=new Blob([text],{type:type+";charset=utf-8"});
+  const u=URL.createObjectURL(b), a=document.createElement("a");
+  a.href=u; a.download=name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(u),1500);
+  toast("Файл сохранён");
+}
+document.getElementById("mReset").onclick=()=>{
+  if(!confirm("Стереть все отметки? Имя, куратор и ссылки на видео останутся.")) return;
+  db.data={}; delete db.alertHidden; save(); render(); closeSheets(); toast("Очищено");
+};
+
+/* print */
+document.getElementById("mPrint").onclick=doPrint;
+function doPrint(){
+  const s=db.profile, st=stats();
+  let h='<h1>Оценка компетенций студента</h1>'+
+    '<p class="ph"><b>'+esc(s.name)+'</b> • куратор: '+(esc(s.curator)||"—")+
+    ' • начало практики: '+(fmt(s.start)||"—")+
+    ' • отмечено: '+st.btn+' из '+st.btnTotal+' ('+Math.round(st.btn/st.btnTotal*100)+'%)'+
+    ' • освоено навыков: '+st.done+' из '+st.total+
+    ' • отчёт от '+fmt(today())+'</p>'+
+    '<table><thead><tr><th class="t">Навык</th><th>Видео-<br>подсказки</th><th>Видели<br>на сессии</th><th>Делали на<br>чужой сессии</th><th>Самостоятельно<br>демонстрирует</th></tr></thead><tbody>';
+  DATA.forEach(sec=>{
+    h+='<tr class="band"><td colspan="5">'+esc(sec.s)+'</td></tr>';
+    sec.r.forEach(r=>{
+      const d=rec(r.id);
+      const fin=finKeys(r).map(k=>'<div class="fin">'+finLabel(k)+': '+(d[k]?fmt(d[k]):"________")+'</div>').join("");
+      h+='<tr><td class="t">'+esc(r.t)+(d.note?'<br><i style="font-size:7pt">'+esc(d.note)+'</i>':"")+'</td>'+
+        '<td class="d">'+(r.v?(d.video?fmt(d.video):""):"—")+'</td>'+
+        '<td class="d">'+(d.seen?fmt(d.seen):"")+'</td>'+
+        '<td class="d">'+(d.did?fmt(d.did):"")+'</td>'+
+        '<td class="d">'+fin+'</td></tr>';
+    });
+  });
+  h+='</tbody></table>';
+  document.getElementById("printarea").innerHTML=h;
+  closeSheets();
+  setTimeout(()=>window.print(),150);
+}
+
+/* filters & search */
+document.getElementById("tabs").addEventListener("click",e=>{
+  const b=e.target.closest("[data-f]"); if(!b) return;
+  ui.filter=b.dataset.f; render();
+});
+const qEl=document.getElementById("q");
+qEl.addEventListener("input",()=>{
+  ui.q=qEl.value.trim().toLowerCase();
+  document.getElementById("qClr").style.display=ui.q?"block":"none";
+  render();
+});
+document.getElementById("qClr").onclick=()=>{ qEl.value=""; ui.q=""; document.getElementById("qClr").style.display="none"; render(); };
+
+/* toast */
+let tt;
+function toast(m){
+  const t=document.getElementById("toast");
+  t.textContent=m; t.classList.add("on");
+  clearTimeout(tt); tt=setTimeout(()=>t.classList.remove("on"),2200);
+}
+
+/* install */
+let deferred;
+window.addEventListener("beforeinstallprompt",e=>{
+  e.preventDefault(); deferred=e;
+  document.getElementById("mInstall").style.display="flex";
+});
+document.getElementById("mInstall").onclick=async()=>{
+  if(!deferred) return;
+  deferred.prompt(); await deferred.userChoice; deferred=null;
+  document.getElementById("mInstall").style.display="none";
+};
+
+/* sticky offset for section bands */
+function stick(){
+  const h=document.querySelector(".top").offsetHeight;
+  document.documentElement.style.setProperty("--stick",h+"px");
+  const a=document.getElementById("curAlert");
+  document.documentElement.style.setProperty("--alert-h", a? (a.offsetHeight+12)+"px" : "0px");
+}
+window.addEventListener("resize",stick);
+
+/* boot */
+applyTheme();
+render(); stick();
+
+if("serviceWorker" in navigator && location.protocol.startsWith("http")){
+  window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
+</script>
+</body>
+</html>
