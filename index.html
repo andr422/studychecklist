@@ -26,36 +26,8 @@
   --shadow:0 1px 2px rgba(27,36,55,.06),0 8px 24px rgba(27,36,55,.06);
   --r:14px;
   --safe-b:env(safe-area-inset-bottom,0px);
+  color-scheme:light;   /* приложение всегда светлое */
 }
-:root[data-theme="dark"],
-:root:not([data-theme="light"]){}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --accent:#F2A055; --accent-soft:#3A2A18;
-    --ink:#EAEDF5; --ink-2:#A8B0C2; --ink-3:#7B8397;
-    --line:#39415A; --line-2:#2B3247;
-    --bg:#151926; --card:#1D2233;
-    --band:#3D3A1E; --band-ink:#E8E2B0;
-    --blue:#8892E0; --blue-soft:#262C44;
-    --ok:#4FBF8B; --ok-soft:#1C3A2D;
-    --warn:#E0A05A;
-    --alert-bg:#3B2A14; --alert-br:#6E4C20; --alert-ink:#F7CE93;
-    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
-  }
-}
-:root[data-theme="dark"]{
-  --accent:#F2A055; --accent-soft:#3A2A18;
-  --ink:#EAEDF5; --ink-2:#A8B0C2; --ink-3:#7B8397;
-  --line:#39415A; --line-2:#2B3247;
-  --bg:#151926; --card:#1D2233;
-  --band:#3D3A1E; --band-ink:#E8E2B0;
-  --blue:#8892E0; --blue-soft:#262C44;
-  --ok:#4FBF8B; --ok-soft:#1C3A2D;
-  --warn:#E0A05A;
-  --alert-bg:#3B2A14; --alert-br:#6E4C20; --alert-ink:#F7CE93;
-  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
-}
-
 *{box-sizing:border-box}
 body{
   margin:0;background:var(--bg);color:var(--ink);
@@ -221,8 +193,21 @@ main{padding:12px 14px calc(28px + var(--safe-b))}
   max-height:88vh;overflow:auto;box-shadow:0 -8px 40px rgba(0,0,0,.16)
 }
 .sheet.on{transform:none}
-.grab{width:38px;height:4px;border-radius:9px;background:var(--line);margin:4px auto 12px}
-.sheet h2{margin:0 0 3px;font-size:16px;font-weight:650}
+.grab{
+  width:100%;height:24px;margin:0 0 6px;position:relative;
+  touch-action:none;cursor:grab;flex:none
+}
+.grab::before{
+  content:"";position:absolute;left:50%;top:9px;transform:translateX(-50%);
+  width:38px;height:4px;border-radius:9px;background:var(--line)
+}
+.grab:active{cursor:grabbing}
+.sheet-x{
+  position:absolute;top:8px;right:12px;width:34px;height:34px;border-radius:10px;
+  display:grid;place-items:center;color:var(--ink-3);z-index:3
+}
+.sheet-x:active{background:var(--line-2);color:var(--ink)}
+.sheet h2{margin:0 0 3px;font-size:16px;font-weight:650;padding-right:36px}
 .sheet .sub{color:var(--ink-2);font-size:13px;margin:0 0 14px}
 .fld{margin-bottom:11px}
 .fld label{display:block;font-size:12px;font-weight:600;color:var(--ink-2);margin-bottom:4px}
@@ -236,7 +221,7 @@ main{padding:12px 14px calc(28px + var(--safe-b))}
 .btn{
   display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
   padding:12px;border-radius:12px;font-weight:600;font-size:14.5px;
-  background:var(--ink);color:var(--card);margin-top:6px
+  background:var(--ink);color:var(--card);margin-top:6px;text-decoration:none
 }
 .btn.sec2{background:var(--line-2);color:var(--ink)}
 .btn.danger{background:transparent;color:#D6483B}
@@ -267,9 +252,6 @@ main{padding:12px 14px calc(28px + var(--safe-b))}
   opacity:0;transition:.22s;pointer-events:none;box-shadow:0 6px 20px rgba(0,0,0,.2);max-width:88vw;text-align:center
 }
 .toast.on{opacity:1;transform:translateX(-50%)}
-.seg{display:flex;background:var(--bg);border-radius:11px;padding:3px;gap:3px;margin-bottom:12px}
-.seg button{flex:1;padding:8px;border-radius:9px;font-size:13px;font-weight:600;color:var(--ink-2)}
-.seg button.on{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
 .secline{height:1px;background:var(--line-2);margin:14px -16px}
 .kv{display:flex;justify-content:space-between;gap:12px;padding:9px 0;font-size:13.5px;border-bottom:1px solid var(--line-2)}
 .kv:last-child{border:0}
@@ -335,6 +317,7 @@ main{padding:12px 14px calc(28px + var(--safe-b))}
 
 <!-- row sheet -->
 <div class="sheet" id="shRow">
+  <button class="sheet-x" aria-label="Закрыть"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   <div class="grab"></div>
   <h2 id="rTitle">—</h2>
   <p class="sub" id="rSec">—</p>
@@ -353,6 +336,7 @@ main{padding:12px 14px calc(28px + var(--safe-b))}
 
 <!-- menu sheet -->
 <div class="sheet" id="shMenu">
+  <button class="sheet-x" aria-label="Закрыть"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   <div class="grab"></div>
   <h2>Настройки и данные</h2>
   <p class="sub" id="mSub">—</p>
@@ -360,9 +344,6 @@ main{padding:12px 14px calc(28px + var(--safe-b))}
   <div class="fld"><label>Куратор</label><input id="pCur" placeholder="Петрова Анна"></div>
   <div class="fld"><label>Начало практики</label><input id="pStart" type="date"></div>
   <div class="secline"></div>
-  <div class="seg" id="segTheme">
-    <button data-t="auto">Авто</button><button data-t="light">Светлая</button><button data-t="dark">Тёмная</button>
-  </div>
   <div id="mStats"></div>
   <div class="secline"></div>
   <div class="grid2">
@@ -382,6 +363,7 @@ main{padding:12px 14px calc(28px + var(--safe-b))}
 
 <!-- curator sheet -->
 <div class="sheet" id="shCur">
+  <button class="sheet-x" aria-label="Закрыть"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   <div class="grab"></div>
   <h2 id="cTitle">Режим куратора</h2>
   <p class="sub" id="cSub">Последний столбец заполняет только куратор.</p>
@@ -486,17 +468,17 @@ function load(){
 }
 function blank(){
   return {profile:{name:"",curator:"",start:today()}, data:{}, links:{},
-          pin:PIN_DEFAULT, curator:false, theme:"auto"};
+          pin:PIN_DEFAULT, curator:false};
 }
 function migrate(o){
   if(o && o.students){            // старый формат с выбором стажёра
     const s=o.students.find(x=>x.id===o.active)||o.students[0]||null;
     o={profile:{name:s?s.name:"", curator:s?s.curator:"", start:s?s.start:today()},
-       data:s?(s.data||{}):{}, links:o.links||{}, pin:o.pin, theme:o.theme};
+       data:s?(s.data||{}):{}, links:o.links||{}, pin:o.pin};
   }
   o=o||{};
   o.profile=o.profile||{name:"",curator:"",start:today()};
-  o.data=o.data||{}; o.links=o.links||{}; o.theme=o.theme||"auto";
+  o.data=o.data||{}; o.links=o.links||{}; delete o.theme;
   if(!o.pin) o.pin=PIN_DEFAULT;
   o.curator=false;                // режим куратора всегда выключен при запуске
   return o;
@@ -706,15 +688,47 @@ function popAlert(was){
 /* -------------- sheets -------------- */
 const scrim=document.getElementById("scrim");
 function openSheet(id){
-  document.querySelectorAll(".sheet").forEach(s=>s.classList.remove("on"));
+  document.querySelectorAll(".sheet").forEach(s=>{
+    s.classList.remove("on"); s.style.transition=""; s.style.transform="";
+  });
   document.getElementById(id).classList.add("on");
   scrim.classList.add("on");
 }
 function closeSheets(){
-  document.querySelectorAll(".sheet").forEach(s=>s.classList.remove("on"));
+  document.querySelectorAll(".sheet").forEach(s=>{
+    s.classList.remove("on"); s.style.transition=""; s.style.transform="";
+  });
   scrim.classList.remove("on");
 }
 scrim.onclick=closeSheets;
+
+/* Шторку можно смахнуть вниз за верхнюю полоску, закрыть крестиком или Esc. */
+document.addEventListener("click",e=>{ if(e.target.closest(".sheet-x")) closeSheets(); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeSheets(); });
+
+document.querySelectorAll(".sheet").forEach(sh=>{
+  const handle=sh.querySelector(".grab");
+  let y0=null, dy=0;
+  handle.addEventListener("pointerdown",e=>{
+    y0=e.clientY; dy=0;
+    sh.style.transition="none";
+    handle.setPointerCapture(e.pointerId);
+  });
+  handle.addEventListener("pointermove",e=>{
+    if(y0===null) return;
+    dy=Math.max(0, e.clientY-y0);
+    sh.style.transform="translateY("+dy+"px)";
+  });
+  const end=()=>{
+    if(y0===null) return;
+    const far=dy>80;
+    y0=null; dy=0;
+    sh.style.transition=""; sh.style.transform="";
+    if(far) closeSheets();
+  };
+  handle.addEventListener("pointerup",end);
+  handle.addEventListener("pointercancel",end);
+});
 
 function openRow(id){
   ui.openRow=id;
@@ -804,16 +818,6 @@ function renderMenu(){
     '<div class="kv"><span>Ждёт подтверждения куратора</span><b>'+st.ready+'</b></div>'+
     '<div class="kv"><span>Видео-подсказок со ссылкой</span><b>'+
       ALL.filter(r=>r.v&&linkOf(r.id)).length+' / '+ALL.filter(r=>r.v).length+'</b></div>';
-  document.querySelectorAll("#segTheme button").forEach(b=>b.classList.toggle("on",b.dataset.t===(db.theme||"auto")));
-}
-document.getElementById("segTheme").onclick=e=>{
-  const b=e.target.closest("button"); if(!b) return;
-  db.theme=b.dataset.t; save(); applyTheme(); renderMenu();
-};
-function applyTheme(){
-  const t=db.theme||"auto";
-  if(t==="auto") document.documentElement.removeAttribute("data-theme");
-  else document.documentElement.setAttribute("data-theme",t);
 }
 
 document.getElementById("mExport").onclick=()=>{
@@ -832,7 +836,7 @@ document.getElementById("fileIn").onchange=e=>{
       const o=JSON.parse(rd.result);
       if(!o || (!o.data && !o.students)) throw 0;
       if(!confirm("Заменить текущие данные данными из файла?")) return;
-      db=migrate(o); save(); applyTheme(); render(); closeSheets(); toast("Импортировано");
+      db=migrate(o); save(); render(); closeSheets(); toast("Импортировано");
     }catch(err){ toast("Файл не подходит"); }
   };
   rd.readAsText(f); e.target.value="";
@@ -931,7 +935,6 @@ function stick(){
 window.addEventListener("resize",stick);
 
 /* boot */
-applyTheme();
 render(); stick();
 
 if("serviceWorker" in navigator && location.protocol.startsWith("http")){
