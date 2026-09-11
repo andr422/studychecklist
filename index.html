@@ -97,6 +97,25 @@ main{padding:12px 14px calc(28px + var(--safe-b))}
 .instr .flow{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-top:8px;font-size:12.5px}
 .instr .flow span{background:var(--card);padding:3px 8px;border-radius:7px;border:1px solid var(--line)}
 
+.helpbar{
+  display:flex;align-items:center;gap:9px;width:100%;margin-bottom:12px;
+  background:var(--blue-soft);border-radius:var(--r);padding:11px 13px;
+  color:var(--blue);font-weight:650;font-size:13.5px;text-align:left
+}
+.helpbar .grow{flex:1;min-width:0}
+.helpbar .cv{opacity:.7;flex:none}
+.helpbar:active{background:color-mix(in srgb,var(--blue) 18%,var(--card))}
+
+.hsteps{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.hstep{display:flex;gap:11px;align-items:flex-start;background:var(--bg);border-radius:12px;padding:11px 12px}
+.hstep .n{
+  width:23px;height:23px;border-radius:8px;background:var(--accent);color:#fff;
+  display:grid;place-items:center;font-size:12px;font-weight:700;flex:none;margin-top:1px
+}
+.hstep .tx{flex:1;min-width:0}
+.hstep .tx b{display:block;font-size:14px;font-weight:650;margin-bottom:2px}
+.hstep .tx span{display:block;font-size:12.5px;color:var(--ink-2);line-height:1.4}
+
 .instr.cta{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 30%,transparent)}
 .instr.cta h3{font-size:15px}
 .instr.cta .btn{max-width:280px}
@@ -157,7 +176,11 @@ main{padding:12px 14px calc(28px + var(--safe-b))}
   display:inline-flex;align-items:center;gap:4px;max-width:100%;
 }
 .badge.note{background:var(--accent-soft);color:var(--warn)}
-.badge.vid{background:var(--blue-soft);color:var(--blue);font-weight:600}
+.badge.vid{
+  background:var(--blue-soft);color:var(--blue);font-weight:650;
+  padding:5px 10px;font-size:12px;text-decoration:none
+}
+a.badge.vid:active{background:var(--blue);color:#fff}
 
 .steps{display:flex;gap:6px;margin-top:9px;align-items:stretch}
 .step{
@@ -361,12 +384,22 @@ main{padding:12px 14px calc(28px + var(--safe-b))}
   <input type="file" id="fileIn" accept="application/json,.json" hidden>
 </div>
 
+<!-- help sheet -->
+<div class="sheet" id="shHelp">
+  <button class="sheet-x" aria-label="Закрыть"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  <div class="grab"></div>
+  <h2>Как пользоваться</h2>
+  <p class="sub">Семь шагов. Инструкция всегда доступна по кнопке вверху списка.</p>
+  <div class="hsteps"><div class="hstep"><span class="n">1</span><div class="tx"><b>Впишите, чей это чек-лист</b><span>Кнопка ☰ вверху слева: имя стажёра, куратор, дата начала. Нужны для шапки отчёта.</span></div></div><div class="hstep"><span class="n">2</span><div class="tx"><b>Посмотрите видео-подсказку</b><span>У одиннадцати навыков есть кнопка «▶ Видео-подсказка» прямо в карточке — открывается сразу, заходить никуда не нужно.</span></div></div><div class="hstep"><span class="n">3</span><div class="tx"><b>Отмечайте слева направо</b><span>Видео → Видели на сессии → Делали на чужой сессии → Самостоятельно. Тап по кнопке ставит сегодняшнюю дату, шкала вверху сразу растёт.</span></div></div><div class="hstep"><span class="n">4</span><div class="tx"><b>Два столбца под замком</b><span>«Делали на чужой сессии» открывает терапист, «Самостоятельно демонстрирует» — куратор. Оба через кнопку с замком вверху справа: нажать и ввести PIN.</span></div></div><div class="hstep"><span class="n">5</span><div class="tx"><b>Следите за напоминанием</b><span>Когда в «Видели» и «Делали» наберётся 65 отметок, вверху появится плашка: пора назначать куратора.</span></div></div><div class="hstep"><span class="n">6</span><div class="tx"><b>Исправить дату</b><span>Кнопка ⋮ справа от названия навыка: там даты можно поменять или стереть, добавить заметку и свою ссылку на видео.</span></div></div><div class="hstep"><span class="n">7</span><div class="tx"><b>Отчёт для куратора</b><span>☰ → «Печать / PDF». Соберётся таблица как в бумажной брошюре, её можно распечатать или сохранить в PDF.</span></div></div></div>
+  <button class="btn" id="helpDone">Понятно</button>
+</div>
+
 <!-- curator sheet -->
 <div class="sheet" id="shCur">
   <button class="sheet-x" aria-label="Закрыть"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   <div class="grab"></div>
   <h2 id="cTitle">Режим куратора</h2>
-  <p class="sub" id="cSub">Последний столбец заполняет только куратор.</p>
+  <p class="sub" id="cSub">«Делали» открывает терапист, последний столбец — куратор.</p>
   <div class="fld"><label>PIN-код</label><input id="cPin" type="password" inputmode="numeric" maxlength="8" placeholder="••••"></div>
   <button class="btn accent" id="cGo">Войти</button>
   <button class="btn sec2" id="cSet" style="margin-top:8px">Задать / сменить PIN</button>
@@ -500,6 +533,10 @@ function fmt(d){ if(!d) return ""; const[y,m,dd]=d.split("-"); return dd+"."+m+"
 /* u — ссылка, вшитая в приложение; db.links — переопределение на этом устройстве. */
 function linkOf(id){ return db.links[id] || (BYID[id] && BYID[id].u) || ""; }
 
+/* Куратор открывает «Делали на чужой сессии» и весь последний столбец. */
+const LOCKED_KEYS=["did","fk","fs"];
+function needsCurator(k){ return LOCKED_KEYS.indexOf(k)>=0; }
+
 function finKeys(r){ return r.f==="both"?["fk","fs"]:r.f==="cur"?["fk"]:["fs"]; }
 function finLabel(k){ return k==="fk"?"куратор":"на сессии"; }
 function stepKeys(r){ return r.v?["video","seen","did"]:["seen","did"]; }
@@ -573,7 +610,7 @@ function render(){
   document.getElementById("btnCur").classList.toggle("on",!!db.curator);
   renderTabs(st);
 
-  let html = alertHTML() + (db.profile.name?"":ctaHTML()) + instrHTML();
+  let html = instrHTML() + alertHTML() + (db.profile.name?"":ctaHTML());
   let shown=0;
   DATA.forEach((sec,si)=>{
     const rows=sec.r.filter(passFilter);
@@ -602,32 +639,32 @@ function ctaHTML(){
 }
 
 function instrHTML(){
-  if(ui.q||ui.filter!=="all") return "";
-  return '<div class="instr">'+
-   '<h3>Как заполнять</h3>'+
-   '<p>Ставьте дату, когда навык успешно продемонстрирован. Чек-лист заполняется слева направо.</p>'+
-   '<div class="flow"><span>Видео</span>→<span>Видели на сессии</span>→<span>Делали на чужой сессии</span>→<span>Самостоятельно</span></div>'+
-   '<p style="margin-top:8px">Последний столбец («Самостоятельно демонстрирует на своём занятии») заполняет <b>только куратор</b> — включите режим куратора кнопкой с замком.</p>'+
-  '</div>';
+  return '<button class="helpbar" id="helpOpen">'+
+    '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.6 2.6 0 0 1 5 .8c0 1.7-2.5 2-2.5 3.7"/><path d="M12 17.2v.1"/></svg>'+
+    '<span class="grow">Как пользоваться</span>'+
+    '<svg class="cv" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>'+
+  '</button>';
 }
 
 function rowHTML(r){
   const d=rec(r.id), nk=nextKey(r), done=isDone(r);
   const link=linkOf(r.id);
   let badges="";
-  if(r.v||link) badges+='<span class="badge vid">▶ видео'+(link?"":" — добавьте ссылку")+'</span>';
+  if(link) badges+='<a class="badge vid" href="'+esc(link)+'" target="_blank" rel="noopener noreferrer">▶ Видео-подсказка</a>';
+  else if(r.v) badges+='<span class="badge vid">▶ видео — добавьте ссылку</span>';
   if(d.note) badges+='<span class="badge note">'+esc(d.note.length>46?d.note.slice(0,46)+"…":d.note)+'</span>';
 
   let steps="";
   stepKeys(r).forEach(k=>{
     const S=STEPS.find(x=>x.k===k), val=d[k];
-    steps+='<button class="step'+(val?" filled":"")+(nk===k?" next":"")+'" data-row="'+r.id+'" data-k="'+k+'">'+
-      '<span class="lb">'+S.lb+'</span><span class="vl">'+(val?fmt(val):"—")+'</span></button>';
+    const locked=needsCurator(k)&&!db.curator;
+    steps+='<button class="step'+(val?" filled":"")+(nk===k&&!locked?" next":"")+(locked&&!val?" lock":"")+'" data-row="'+r.id+'" data-k="'+k+'">'+
+      '<span class="lb">'+(locked&&!val?"🔒 ":"")+S.lb+'</span><span class="vl">'+(val?fmt(val):"—")+'</span></button>';
   });
   if(!r.v) steps='<button class="step na" data-row="'+r.id+'" data-k="video" disabled><span class="lb">Видео</span><span class="vl">нет</span></button>'+steps;
   steps+='<div class="divider"></div>';
   finKeys(r).forEach(k=>{
-    const val=d[k], locked=!db.curator;
+    const val=d[k], locked=needsCurator(k)&&!db.curator;
     steps+='<button class="step fin'+(val?" filled":"")+(nk===k&&db.curator?" next":"")+(locked&&!val?" lock":"")+'" data-row="'+r.id+'" data-k="'+k+'">'+
       '<span class="lb">'+(locked&&!val?"🔒 ":"")+finLabel(k)+'</span><span class="vl">'+(val?fmt(val):"—")+'</span></button>';
   });
@@ -651,6 +688,7 @@ function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;","
 
 /* -------------- interactions -------------- */
 app.addEventListener("click",e=>{
+  if(e.target.closest("#helpOpen")){ openHelp(); return; }
   if(e.target.closest("#alertX")){ db.alertHidden=true; save(); render(); return; }
   if(e.target.closest("#ctaAdd")){ renderMenu(); openSheet("shMenu"); return; }
   const band=e.target.closest("[data-band]");
@@ -663,7 +701,11 @@ app.addEventListener("click",e=>{
 
 function tapStep(id,k){
   const r=BYID[id], d=rec(id), isFin=k==="fk"||k==="fs";
-  if(isFin && !db.curator){ openSheet("shCur"); toast("Этот столбец заполняет куратор"); return; }
+  if(needsCurator(k) && !db.curator){
+    openSheet("shCur");
+    toast(isFin?"Этот столбец заполняет куратор":"«Делали» открывает терапист");
+    return;
+  }
   if(d[k]){ openRow(id); return; }
   if(!isFin){
     const prev=stepKeys(r).slice(0,stepKeys(r).indexOf(k));
@@ -676,6 +718,12 @@ function tapStep(id,k){
   popAlert(was);
   if(isDone(r)) toast("Навык освоен ✓");
 }
+
+function openHelp(){
+  if(!db.seenHelp){ db.seenHelp=true; save(); }
+  openSheet("shHelp");
+}
+document.getElementById("helpDone").onclick=closeSheets;
 
 /* Плашка появилась только что — показать её и подсветить. */
 function popAlert(was){
@@ -738,7 +786,7 @@ function openRow(id){
   document.getElementById("rLink").value=linkOf(id);
   document.getElementById("rNote").value=d.note||"";
   const box=document.getElementById("rSteps");
-  const keys=[...stepKeys(r).map(k=>({k,lb:STEPS.find(x=>x.k===k).full,lock:false})),
+  const keys=[...stepKeys(r).map(k=>({k,lb:STEPS.find(x=>x.k===k).full,lock:needsCurator(k)&&!db.curator})),
               ...finKeys(r).map(k=>({k,lb:"Самостоятельно — "+finLabel(k),lock:!db.curator}))];
   box.innerHTML=keys.map((o,i)=>
     '<div class="se'+(d[o.k]?" done":"")+(o.lock?" locked":"")+'">'+
@@ -747,13 +795,15 @@ function openRow(id){
       '<input type="date" data-dk="'+o.k+'" value="'+(d[o.k]||"")+'"'+(o.lock?" disabled":"")+'>'+
       (d[o.k]&&!o.lock?'<button class="x" data-clr="'+o.k+'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>':"")+
     '</div>').join("");
+  const oldBtn=document.getElementById("rVidLink");   // иначе кнопка добавлялась при каждом открытии
+  if(oldBtn) oldBtn.remove();
   if(linkOf(id)){
     const a=document.createElement("a");
     a.href=linkOf(id); a.target="_blank"; a.rel="noopener noreferrer";
     a.className="btn sec2"; a.style.marginBottom="12px"; a.textContent="▶ Открыть видео-подсказку";
-    box.insertAdjacentElement("afterend",a);
     a.id="rVidLink";
-  }else{ const old=document.getElementById("rVidLink"); if(old) old.remove(); }
+    box.insertAdjacentElement("afterend",a);
+  }
   openSheet("shRow");
 }
 document.getElementById("rSteps").addEventListener("change",e=>{
@@ -787,7 +837,7 @@ document.getElementById("btnCur").onclick=()=>{
   if(db.curator){ db.curator=false; save(); render(); toast("Режим куратора выключен"); return; }
   document.getElementById("cPin").value="";
   document.getElementById("cSub").textContent = db.pin
-    ? "Последний столбец заполняет только куратор. Введите PIN."
+    ? "«Делали» открывает терапист, последний столбец — куратор. Введите PIN."
     : "PIN снят — вход свободный.";
   document.getElementById("cGo").textContent = db.pin?"Войти":"Войти без PIN";
   openSheet("shCur");
@@ -936,6 +986,7 @@ window.addEventListener("resize",stick);
 
 /* boot */
 render(); stick();
+if(!db.seenHelp) openHelp();          // при первом открытии — сразу инструкция
 
 if("serviceWorker" in navigator && location.protocol.startsWith("http")){
   window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
