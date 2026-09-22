@@ -106,6 +106,16 @@ main{padding:12px 14px calc(28px + var(--safe-b))}
 .helpbar .cv{opacity:.7;flex:none}
 .helpbar:active{background:color-mix(in srgb,var(--blue) 18%,var(--card))}
 
+.linkbtn{
+  display:block;width:100%;text-align:center;padding:9px;margin-bottom:4px;
+  color:var(--ink-2);font-size:13px;font-weight:600;text-decoration:underline;
+  text-underline-offset:3px
+}
+.linkbtn:active{color:var(--ink)}
+.plat{font-size:12px;font-weight:700;color:var(--ink-3);letter-spacing:.03em;
+  text-transform:uppercase;margin:12px 0 6px}
+.plat:first-child{margin-top:0}
+
 .hsteps{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
 .hstep{display:flex;gap:11px;align-items:flex-start;background:var(--bg);border-radius:12px;padding:11px 12px}
 .hstep .n{
@@ -389,7 +399,18 @@ a.badge.vid:active{background:var(--blue);color:#fff}
   <button class="sheet-x" aria-label="Закрыть"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   <div class="grab"></div>
   <h2>Как пользоваться</h2>
-  <p class="sub">Семь шагов. Инструкция всегда доступна по кнопке вверху списка.</p>
+  <p class="sub">Инструкция всегда доступна по кнопке «Как пользоваться» вверху списка.</p>
+
+  <div id="insBlock">
+    <div class="plat">Поставьте на домашний экран</div>
+    <p class="hint" style="margin:0 0 9px">Чек-лист будет открываться одним нажатием и работать без интернета.</p>
+    <div id="insSteps"></div>
+    <button class="btn accent" id="insNow" hidden>Установить</button>
+    <button class="linkbtn" id="insOther">Показать для других устройств</button>
+    <div class="secline"></div>
+  </div>
+
+  <div class="plat">Как заполнять чек-лист</div>
   <div class="hsteps"><div class="hstep"><span class="n">1</span><div class="tx"><b>Впишите, чей это чек-лист</b><span>Кнопка ☰ вверху слева: имя стажёра, куратор, дата начала. Нужны для шапки отчёта.</span></div></div><div class="hstep"><span class="n">2</span><div class="tx"><b>Посмотрите видео-подсказку</b><span>У одиннадцати навыков есть кнопка «▶ Видео-подсказка» прямо в карточке — открывается сразу, заходить никуда не нужно.</span></div></div><div class="hstep"><span class="n">3</span><div class="tx"><b>Отмечайте слева направо</b><span>Видео → Видели на сессии → Делали на чужой сессии → Самостоятельно. Тап по кнопке ставит сегодняшнюю дату, шкала вверху сразу растёт.</span></div></div><div class="hstep"><span class="n">4</span><div class="tx"><b>Два столбца под замком</b><span>«Делали на чужой сессии» открывает терапист, «Самостоятельно демонстрирует» — куратор. Оба через кнопку с замком вверху справа: нажать и ввести PIN.</span></div></div><div class="hstep"><span class="n">5</span><div class="tx"><b>Следите за напоминанием</b><span>Когда в «Видели» и «Делали» наберётся 65 отметок, вверху появится плашка: пора назначать куратора.</span></div></div><div class="hstep"><span class="n">6</span><div class="tx"><b>Исправить дату</b><span>Кнопка ⋮ справа от названия навыка: там даты можно поменять или стереть, добавить заметку и свою ссылку на видео.</span></div></div><div class="hstep"><span class="n">7</span><div class="tx"><b>Отчёт для куратора</b><span>☰ → «Печать / PDF». Соберётся таблица как в бумажной брошюре, её можно распечатать или сохранить в PDF.</span></div></div></div>
   <button class="btn" id="helpDone">Понятно</button>
 </div>
@@ -719,9 +740,51 @@ function tapStep(id,k){
   if(isDone(r)) toast("Навык освоен ✓");
 }
 
+/* ---------- установка на домашний экран ---------- */
+const INSTALL={
+  ios:{t:"iPhone и iPad", s:[
+    "Откройте чек-лист в Safari и нажмите кнопку «Поделиться» внизу экрана — квадрат со стрелкой вверх.",
+    "Пролистайте список вниз до пункта «На экран „Домой“».",
+    "Нажмите «Добавить». Иконка встанет рядом с остальными приложениями."]},
+  android:{t:"Android", s:[
+    "Нажмите ⋮ в правом верхнем углу Chrome.",
+    "Выберите «Установить приложение» или «Добавить на главный экран».",
+    "Подтвердите — приложение появится вместе с остальными."]},
+  desktop:{t:"Компьютер", s:[
+    "В адресной строке Chrome нажмите значок установки — монитор со стрелкой вниз.",
+    "Или откройте меню ⋮ и выберите «Установить».",
+    "Приложение откроется в отдельном окне, без адресной строки."]}
+};
+function platform(){
+  const ua=navigator.userAgent;
+  if(/Android/.test(ua)) return "android";          // проверяем раньше: эвристика iPad ниже ловит и его
+  if(/iPad|iPhone|iPod/.test(ua)) return "ios";
+  if(navigator.platform==="MacIntel" && navigator.maxTouchPoints>1) return "ios";   // iPad с десктопным UA
+  return "desktop";
+}
+function isInstalled(){
+  return matchMedia("(display-mode: standalone)").matches || navigator.standalone===true;
+}
+function renderInstall(all){
+  const keys = all ? ["ios","android","desktop"] : [platform()];
+  document.getElementById("insSteps").innerHTML = keys.map(k=>{
+    const P=INSTALL[k];
+    return (all?'<div class="plat">'+P.t+'</div>':'')+
+      '<div class="hsteps">'+P.s.map((x,i)=>
+        '<div class="hstep"><span class="n">'+(i+1)+'</span><div class="tx"><span>'+esc(x)+'</span></div></div>'
+      ).join("")+'</div>';
+  }).join("");
+  document.getElementById("insOther").hidden=all;
+  document.getElementById("insNow").hidden=!deferred;
+}
+document.getElementById("insOther").onclick=()=>renderInstall(true);
+
 function openHelp(){
   if(!db.seenHelp){ db.seenHelp=true; save(); }
+  document.getElementById("insBlock").hidden=isInstalled();   // уже установлено — раздел лишний
+  renderInstall(false);
   openSheet("shHelp");
+  document.getElementById("shHelp").scrollTop=0;
 }
 document.getElementById("helpDone").onclick=closeSheets;
 
@@ -969,11 +1032,15 @@ window.addEventListener("beforeinstallprompt",e=>{
   e.preventDefault(); deferred=e;
   document.getElementById("mInstall").style.display="flex";
 });
-document.getElementById("mInstall").onclick=async()=>{
+async function runInstallPrompt(){
   if(!deferred) return;
   deferred.prompt(); await deferred.userChoice; deferred=null;
   document.getElementById("mInstall").style.display="none";
-};
+  document.getElementById("insNow").hidden=true;
+}
+document.getElementById("mInstall").onclick=runInstallPrompt;
+document.getElementById("insNow").onclick=runInstallPrompt;
+
 
 /* sticky offset for section bands */
 function stick(){
@@ -986,7 +1053,7 @@ window.addEventListener("resize",stick);
 
 /* boot */
 render(); stick();
-if(!db.seenHelp) openHelp();          // при первом открытии — сразу инструкция
+if(!db.seenHelp) openHelp();          // первый запуск — инструкция целиком
 
 if("serviceWorker" in navigator && location.protocol.startsWith("http")){
   window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
