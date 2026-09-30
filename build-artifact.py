@@ -174,7 +174,7 @@ DLP.then(D=>{ if(D) document.getElementById("repDl").hidden=false; });""",
 )
 
 # пояснение про веб-версию в меню
-script_note = """  <p class="hint" style="text-align:center">Данные не уходят в сеть — всё лежит в этом браузере. Делайте экспорт JSON перед сменой устройства.</p>"""
+script_note = """  <p class="hint" style="text-align:center">Отметки и даты лежат в этом браузере. В Google-таблицу уходят только имя, куратор и счётчики — если адрес указан выше. Делайте экспорт JSON перед сменой устройства.</p>"""
 body = cut(
     body,
     script_note,

@@ -14,7 +14,7 @@ import base64, pathlib, struct, sys, zlib
 
 HERE = pathlib.Path(__file__).parent
 SRC = HERE / "stickers"
-ICONS = HERE / "icons"
+ICONS = HERE               # иконки лежат в корне, рядом с index.html
 
 ICON_BG = (234, 241, 255)      # светло-голубой под цвет стикеров
 

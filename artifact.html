@@ -419,8 +419,16 @@ a.badge.vid:active{background:var(--blue);color:#fff}
   <div class="fld"><label>Куратор</label><input id="pCur" placeholder="Петрова Анна"></div>
   <div class="fld"><label>Начало практики</label><input id="pStart" type="date"></div>
   <div class="secline"></div>
-  <div class="mhero"><i class="stk stk-growth"></i><span class="plat" style="margin:0">Как идёт практика</span></div>
+  <div class="plat">Как идёт практика</div>
   <div id="mStats"></div>
+  <div class="secline"></div>
+  <div class="mhero"><i class="stk stk-growth"></i><span class="plat" style="margin:0">Google-таблица</span></div>
+  <div class="kv" style="border:0;padding-top:0"><span id="syncState">—</span><button id="syncNow" style="color:var(--accent);font-weight:650;font-size:13px">Отправить</button></div>
+  <div class="fld">
+    <label>Адрес веб-приложения Apps Script</label>
+    <input id="syncUrl" type="url" inputmode="url" placeholder="https://script.google.com/macros/s/…/exec">
+    <div class="hint">Куда отправлять имя стажёра и счётчик отметок. Пустое поле — выгрузка выключена.</div>
+  </div>
   <div class="secline"></div>
   <div class="grid2">
     <button class="btn sec2" id="mExport">Экспорт JSON</button>
@@ -792,7 +800,7 @@ function tapStep(id,k){
   }
   const was=alertOn();
   d[k]=today();
-  save(); render();
+  save(); render(); queueSync();
   popAlert(was);
   if(isDone(r)) toast("Навык освоен ✓");
 }
@@ -929,12 +937,12 @@ function openRow(id){
 document.getElementById("rSteps").addEventListener("change",e=>{
   const k=e.target.dataset.dk; if(!k) return;
   const was=alertOn();
-  rec(ui.openRow)[k]=e.target.value; save(); render(); openRow(ui.openRow);
+  rec(ui.openRow)[k]=e.target.value; save(); render(); queueSync(); openRow(ui.openRow);
   popAlert(was);
 });
 document.getElementById("rSteps").addEventListener("click",e=>{
   const b=e.target.closest("[data-clr]"); if(!b) return;
-  delete rec(ui.openRow)[b.dataset.clr]; save(); render(); openRow(ui.openRow);
+  delete rec(ui.openRow)[b.dataset.clr]; save(); render(); queueSync(); openRow(ui.openRow);
 });
 document.getElementById("rSave").onclick=()=>{
   const id=ui.openRow, link=document.getElementById("rLink").value.trim();
@@ -948,7 +956,7 @@ document.getElementById("rSave").onclick=()=>{
 document.getElementById("btnWho").onclick=()=>{ renderMenu(); openSheet("shMenu"); };
 [["pName","name"],["pCur","curator"],["pStart","start"]].forEach(([el,k])=>{
   document.getElementById(el).addEventListener("input",e=>{
-    db.profile[k]=e.target.value.trim(); save(); render();
+    db.profile[k]=e.target.value.trim(); save(); render(); queueSync();
   });
 });
 
@@ -982,6 +990,8 @@ function renderMenu(){
   document.getElementById("pCur").value=db.profile.curator||"";
   document.getElementById("pStart").value=db.profile.start||today();
   document.getElementById("mSub").textContent="Один чек-лист на одного стажёра.";
+  document.getElementById("syncUrl").value=(db.sheet&&db.sheet.url)||"";
+  renderSync();
   document.getElementById("mStats").innerHTML=
     '<div class="kv"><span>Отмечено кнопок</span><b>'+st.btn+' / '+st.btnTotal+'</b></div>'+
     '<div class="kv"><span>Освоено навыков</span><b>'+st.done+' / '+st.total+'</b></div>'+
@@ -1050,8 +1060,86 @@ async function dl(name,text,type){
 }
 document.getElementById("mReset").onclick=()=>{
   if(!confirm("Стереть все отметки? Имя, куратор и ссылки на видео останутся.")) return;
-  db.data={}; delete db.alertHidden; save(); render(); closeSheets(); toast("Очищено");
+  db.data={}; delete db.alertHidden; save(); render(); queueSync(); closeSheets(); toast("Очищено");
 };
+
+/* ---------- выгрузка в Google-таблицу ----------
+   Адрес можно вшить сюда для всего центра либо ввести на устройстве в ☰. */
+const SHEET_URL="https://script.google.com/macros/s/AKfycbxdnTOrYKJdBF0Ck9uKKzcP0vjnJWZdXnUf-JJMgzZzSUNmdCfz8cc0xXhx2om8jFJx/exec";
+
+function sheetUrl(){ return (db.sheet && db.sheet.url) || SHEET_URL; }
+function sheetState(){ db.sheet=db.sheet||{}; return db.sheet; }
+
+function syncPayload(){
+  const st=stats();
+  const col=k=>ALL.reduce((n,r)=>n+((keysOf(r).indexOf(k)>=0 && rec(r.id)[k])?1:0),0);
+  return {
+    name:db.profile.name||"", curator:db.profile.curator||"", start:db.profile.start||"",
+    marked:st.btn, total:st.btnTotal, skills:st.done, skillsTotal:st.total,
+    video:col("video"), seen:col("seen"), did:col("did"), fk:col("fk"), fs:col("fs"),
+    updated:new Date().toISOString()
+  };
+}
+
+let syncTimer;
+function queueSync(){
+  if(!sheetUrl() || !db.profile.name) return;
+  clearTimeout(syncTimer);
+  syncTimer=setTimeout(()=>sendSync(false), 4000);   // копим правки, шлём одним запросом
+}
+
+async function sendSync(manual){
+  const url=sheetUrl(), S=sheetState();
+  if(!url){ if(manual) toast("Сначала укажите адрес таблицы"); return; }
+  if(!db.profile.name){ if(manual) toast("Сначала впишите имя стажёра"); return; }
+  S.state="sending"; renderSync();
+  const body=JSON.stringify(syncPayload());
+  // text/plain — чтобы браузер не слал предварительный OPTIONS, который Apps Script не понимает
+  const opt={method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body};
+  try{
+    const res=await fetch(url, opt);
+    let ok=false;
+    try{ ok=(await res.text()).indexOf('"ok":true')>=0; }catch(_){}
+    S.state=ok?"ok":"blind";   // запись обычно проходит, даже если ответ не прочитался
+    S.at=Date.now(); S.err="";
+  }catch(e){
+    try{                       // браузер заблокировал чтение — отправляем вслепую
+      await fetch(url, Object.assign({mode:"no-cors"}, opt));
+      S.state="blind"; S.at=Date.now(); S.err="";
+    }catch(e2){
+      S.state="err"; S.err=String((e2 && e2.message) || e.message || e);
+    }
+  }
+  save(); renderSync();
+  if(manual) toast(S.state==="err" ? "Не удалось отправить" : "Отправлено в таблицу");
+}
+
+function agoText(ms){
+  const m=Math.round((Date.now()-ms)/60000);
+  if(m<1) return "только что";
+  if(m<60) return m+" мин назад";
+  const h=Math.round(m/60);
+  return h<24 ? h+" ч назад" : Math.round(h/24)+" дн назад";
+}
+function renderSync(){
+  const el=document.getElementById("syncState"); if(!el) return;
+  const S=sheetState();
+  el.style.color="";
+  if(!sheetUrl()){ el.textContent="Выгрузка выключена"; return; }
+  if(S.state==="sending"){ el.textContent="Отправляю…"; return; }
+  if(S.state==="err"){ el.textContent="Не отправлено: "+(S.err||"ошибка"); el.style.color="#D6483B"; return; }
+  if(S.state==="blind"){ el.textContent="Отправлено "+agoText(S.at)+" (без подтверждения)"; return; }
+  if(S.state==="ok"){ el.textContent="Отправлено "+agoText(S.at); return; }
+  el.textContent="Ещё не отправлялось";
+}
+document.getElementById("syncNow").onclick=()=>sendSync(true);
+document.getElementById("syncUrl").addEventListener("input",e=>{
+  const v=e.target.value.trim();
+  const S=sheetState();
+  if(v) S.url=v; else delete S.url;
+  S.state=null; S.err="";
+  save(); renderSync();
+});
 
 /* print */
 document.getElementById("mPrint").onclick=doPrint;

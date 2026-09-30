@@ -1,7 +1,7 @@
-const CACHE = 'aba-comp-v2';
+const CACHE = 'aba-comp-v3';
 const ASSETS = [
   './', './index.html', './manifest.webmanifest',
-  './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable.png'
+  './icon-192.png', './icon-512.png', './icon-maskable.png'
 ];
 
 self.addEventListener('install', e => {
