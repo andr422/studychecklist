@@ -1027,6 +1027,7 @@ function syncPayload(){
   const col=k=>ALL.reduce((n,r)=>n+((keysOf(r).indexOf(k)>=0 && rec(r.id)[k])?1:0),0);
   return {
     name:db.profile.name||"", curator:db.profile.curator||"", start:db.profile.start||"",
+    pair:alertCount(), pairTotal:ALERT_TOTAL,          // «видели» + «делали»
     marked:st.btn, total:st.btnTotal, skills:st.done, skillsTotal:st.total,
     video:col("video"), seen:col("seen"), did:col("did"), fk:col("fk"), fs:col("fs"),
     updated:new Date().toISOString()

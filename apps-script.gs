@@ -13,10 +13,11 @@
  * новые стажёры дописываются снизу.
  */
 
-var SHEET_NAME = 'Стажёры';
+var SHEET_NAME = 'компетенции';   // имя листа внутри таблицы — поменяйте, если переименуете
 
 var HEAD = [
   'Обновлено', 'Стажёр', 'Куратор', 'Начало практики',
+  'Отмечено «видели» и «делали»', 'Всего «видели» и «делали»',
   'Отмечено кнопок', 'Всего кнопок', 'Освоено навыков', 'Всего навыков',
   'Видео', 'Видели на сессии', 'Делали на чужой сессии',
   'Самостоятельно: куратор', 'Самостоятельно: на сессии'
@@ -29,6 +30,12 @@ function sheet_() {
     sh.appendRow(HEAD);
     sh.getRange(1, 1, 1, HEAD.length).setFontWeight('bold');
     sh.setFrozenRows(1);
+  } else {
+    // шапка изменилась после обновления скрипта — переписываем
+    var cur = sh.getRange(1, 1, 1, HEAD.length).getValues()[0].join('\u0000');
+    if (cur !== HEAD.join('\u0000')) {
+      sh.getRange(1, 1, 1, HEAD.length).setValues([HEAD]).setFontWeight('bold');
+    }
   }
   return sh;
 }
@@ -42,6 +49,7 @@ function doPost(e) {
     var sh = sheet_();
     var row = [
       new Date(), name, d.curator || '', d.start || '',
+      Number(d.pair) || 0, Number(d.pairTotal) || 0,
       Number(d.marked) || 0, Number(d.total) || 0,
       Number(d.skills) || 0, Number(d.skillsTotal) || 0,
       Number(d.video) || 0, Number(d.seen) || 0, Number(d.did) || 0,
